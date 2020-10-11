@@ -44,6 +44,13 @@ class RequestHandler(BaseHTTPRequestHandler):
                         print(ex)
 
                     system_info = hp3parclient.getStorageSystemInfo()
+                    #print("Sys info is :" + str(system_info))
+                    system_capacity = hp3parclient.getOverallSystemCapacity()
+                    #print("Overall capacity is :" + str(system_capacity))
+                    volumes = hp3parclient.getVolumes()
+                    #print("volumes are :" + str(volumes))
+
+                    
                     hp3parclient.logout()
                     prometheus_metrics.gauge_hp3par_total_capacity_mib \
                         .labels(id=system_info["id"],
@@ -64,6 +71,22 @@ class RequestHandler(BaseHTTPRequestHandler):
                         .labels(id=system_info["id"],
                                 hp3par_name=system_info["name"]) \
                         .set(system_info["failedCapacityMiB"])
+
+                    prometheus_metrics.gauge_hp3par_volumes \
+                        .labels(id=system_info["id"],
+                                hp3par_name=system_info["name"]) \
+                        .set(volumes["total"])
+
+                    for member in volumes["members"]:
+                             volumename = member["name"]
+                             total_size = member["sizeMiB"]
+                             used_size = member['userSpace']['usedMiB']
+                             #print("volume : " + str(volumename) +" used size : " + str(used_size))
+                             prometheus_metrics.gauge_hp3par_volume_used \
+                                 .labels(id=system_info["id"],
+                                         hp3par_name=member["name"]) \
+                                 .set(member['userSpace']['usedMiB'])
+
 
                 # generate and publish metrics
                 metrics = generate_latest(prometheus_metrics.registry)
