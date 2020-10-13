@@ -13,5 +13,12 @@ gauge_hp3par_failed_capacity_mib = Gauge('hp3par_failedCapacityMiB',
 gauge_hp3par_volumes = Gauge('hp3par_volumes',
                                          'Total failed capacity in MiB', ["id", "hp3par_name"])
 gauge_hp3par_volume_used = Gauge('hp3par_volume_used',
-                                         'Volume used size :', ["id", "hp3par_name"])
-
+                                         'Volume used size', ["id", "hp3par_name", "baseId"])
+gauge_hp3par_volume_total = Gauge('hp3par_volume_total',
+                                         'Volume total size', ["id", "hp3par_name", "baseId"])
+gauge_hp3par_cpg_user = Gauge('hp3par_cpg_userl',
+                                         'Volume total size', ["id", "hp3par_name"])
+gauge_hp3par_cpg_admin = Gauge('hp3par_cpg_admin',
+                                         'Volume total size', ["id", "hp3par_name"])
+gauge_hp3par_cpg_snapshot = Gauge('hp3par_cpg_snapshot',
+                                         'Volume total size', ["id", "hp3par_name"])
