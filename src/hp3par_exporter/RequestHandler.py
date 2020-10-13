@@ -72,20 +72,43 @@ class RequestHandler(BaseHTTPRequestHandler):
                                 hp3par_name=system_info["name"]) \
                         .set(system_info["failedCapacityMiB"])
 
+                    prometheus_metrics.gauge_hp3par_cpg_user \
+                        .labels(id=system_info["id"],
+                                hp3par_name=system_info["name"]) \
+                        .set(system_capacity['allCapacity']['allocated']['volumes']['CPGUserUsedMiB'])
+
+                    prometheus_metrics.gauge_hp3par_cpg_admin \
+                        .labels(id=system_info["id"],
+                                hp3par_name=system_info["name"]) \
+                        .set(system_capacity['allCapacity']['allocated']['volumes']['CPGAdminUsedMiB'])
+
+                    prometheus_metrics.gauge_hp3par_cpg_snapshot \
+                        .labels(id=system_info["id"],
+                                hp3par_name=system_info["name"]) \
+                        .set(system_capacity['allCapacity']['allocated']['volumes']['CPGSnapshotUsedMiB'])
+
+
+
                     prometheus_metrics.gauge_hp3par_volumes \
                         .labels(id=system_info["id"],
                                 hp3par_name=system_info["name"]) \
                         .set(volumes["total"])
 
                     for member in volumes["members"]:
-                             volumename = member["name"]
-                             total_size = member["sizeMiB"]
-                             used_size = member['userSpace']['usedMiB']
+                             #volumename = member["name"]
+                             #total_size = member["sizeMiB"]
+                             #used_size = member['userSpace']['usedMiB']
                              #print("volume : " + str(volumename) +" used size : " + str(used_size))
                              prometheus_metrics.gauge_hp3par_volume_used \
                                  .labels(id=system_info["id"],
+                                         baseId=member["baseId"],
                                          hp3par_name=member["name"]) \
                                  .set(member['userSpace']['usedMiB'])
+                             prometheus_metrics.gauge_hp3par_volume_total \
+                                 .labels(id=system_info["id"],
+                                         baseId=member["baseId"],
+                                         hp3par_name=member["name"]) \
+                                 .set(member["sizeMiB"])
 
 
                 # generate and publish metrics
@@ -102,7 +125,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(b"""<html>
             <head><title>HP 3PAR Exporter</title></head>
             <body>
-            <h1>HP iLO Exporter</h1>
+            <h1>HP 3PAR Exporter</h1>
             <p>Visit <a href="/metrics">Metrics</a> to use.</p>
             </body>
             </html>""")
